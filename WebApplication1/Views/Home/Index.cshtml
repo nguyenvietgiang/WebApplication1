@@ -1,0 +1,21 @@
+﻿@using System.Data
+@model List<TimezoneResponseModel>
+
+
+<h2>Hiển Thị Danh Sách Múi Giờ</h2>
+
+<div id="btnContainer">
+    <button class="btn" onclick="listView()"><i class="fa fa-bars"></i> List</button>
+    <button class="btn active" onclick="gridView()"><i class="fa fa-th-large"></i> Grid</button>
+</div>
+<br>
+
+<div class="row">
+     @foreach (TimezoneResponseModel row in Model)
+        {
+        <div class="column" style="background-color:#aaa;">
+        <h2>@row.Name</h2>
+        <p>@row.Description</p>
+        </div>
+        }
+</div>
