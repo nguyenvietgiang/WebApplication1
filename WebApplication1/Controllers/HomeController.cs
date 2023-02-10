@@ -23,7 +23,7 @@ namespace WebApplication1.Controllers
             _logger = logger;
         }
 
-        public async Task <IActionResult> Index(int? page)
+        public async Task<IActionResult> Index(int? page)
         {
             if (page == null)
             {
@@ -32,8 +32,8 @@ namespace WebApplication1.Controllers
                     client.BaseAddress = new Uri(baseURL);
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                  
-                        HttpResponseMessage getData = await client.GetAsync("timezones");
+
+                    HttpResponseMessage getData = await client.GetAsync("timezones");
                     if (getData.IsSuccessStatusCode)
                     {
                         string result = getData.Content.ReadAsStringAsync().Result;
@@ -64,7 +64,7 @@ namespace WebApplication1.Controllers
                     client.DefaultRequestHeaders.Accept.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                    HttpResponseMessage getData = await client.GetAsync("timezones?page="+page);
+                    HttpResponseMessage getData = await client.GetAsync("timezones?page=" + page);
 
                     if (getData.IsSuccessStatusCode)
                     {
@@ -99,12 +99,13 @@ namespace WebApplication1.Controllers
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                HttpResponseMessage getData = await client.GetAsync("timezones/"+code);
+                HttpResponseMessage getData = await client.GetAsync("timezones/" + code);
 
                 if (getData.IsSuccessStatusCode)
                 {
                     string result = getData.Content.ReadAsStringAsync().Result;
-                    var res = JsonConvert.DeserializeObject<TimezoneResponseModel>(result);
+                    var resultMasterFormated = JsonConvert.DeserializeObject<TimezoneMasterResponseModel>(result);
+                    var res = resultMasterFormated?.Data;
                     return View(res);
                 }
                 else
@@ -116,7 +117,7 @@ namespace WebApplication1.Controllers
 
         }
 
-            public IActionResult Privacy()
+        public IActionResult Privacy()
         {
             return View();
         }
@@ -128,3 +129,6 @@ namespace WebApplication1.Controllers
         }
     }
 }
+
+
+
