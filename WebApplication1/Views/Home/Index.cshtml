@@ -1,5 +1,5 @@
 ﻿@using System.Data
-@model List<TimezoneResponseModel>
+@model TimezoneResponsePaginationModel;
 
 
 <h2>Hiển Thị Danh Sách Múi Giờ</h2>
@@ -11,11 +11,20 @@
 <br>
 
 <div class="row">
-     @foreach (TimezoneResponseModel row in Model)
+    @foreach (TimezoneResponseModel row in Model.Content)
         {
         <div class="column" style="background-color:#aaa;">
-        <h2>@row.Name</h2>
-        <p>@row.Description</p>
+            <a href="@Url.Action("DetailTimeZone", "Home", new { @code = row.Code })">
+            <h2>@row.Name</h2>
+            </a>
+            <p>@row.Description</p>
         </div>
         }
 </div>
+<div class="pagination">
+    <a href="@Url.Action("Index", "Home")?page=1">1</a>
+    <a href="@Url.Action("Index", "Home")?page=2">2</a>
+    <a href="@Url.Action("Index", "Home")?page=3">3</a>
+    <a href="@Url.Action("Index", "Home")?page=4">4</a>
+</div>
+

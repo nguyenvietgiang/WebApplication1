@@ -13,8 +13,8 @@ namespace WebApplication1.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        TimezoneResponseModelResponsePagination _timez = new TimezoneResponseModelResponsePagination();
-        List<TimezoneResponseModelResponsePagination> _timezs = new List<TimezoneResponseModelResponsePagination>();
+        TimezoneMasterResponseModel _timez = new TimezoneMasterResponseModel();
+        List<TimezoneMasterResponseModel> _timezs = new List<TimezoneMasterResponseModel>();
 
         string baseURL = "http://dev.s-erp.com.vn:9038/v1/";
 
@@ -23,7 +23,75 @@ namespace WebApplication1.Controllers
             _logger = logger;
         }
 
-        public async Task <IActionResult> Index()
+        public async Task <IActionResult> Index(int? page)
+        {
+            if (page == null)
+            {
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseURL);
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                  
+                        HttpResponseMessage getData = await client.GetAsync("timezones");
+                    if (getData.IsSuccessStatusCode)
+                    {
+                        string result = getData.Content.ReadAsStringAsync().Result;
+                        var res = JsonConvert.DeserializeObject<TimezoneMasterResponseModel>(result);
+                        TimezoneResponsePaginationModel resPagi = new TimezoneResponsePaginationModel();
+                        if (res != null && res.Code == 200)
+                        {
+                            resPagi.CurrentPage = res.Data.CurrentPage;
+                            resPagi.TotalPages = res.Data.TotalPages;
+                            resPagi.PageSize = res.Data.PageSize;
+                            resPagi.NumberOfRecords = res.Data.NumberOfRecords;
+                            resPagi.TotalRecords = res.Data.TotalRecords;
+                            resPagi.Content = res.Data.Content;
+                        }
+                        return View(resPagi);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error calling web api");
+                    }
+                }
+            }
+            else
+            {
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(baseURL);
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    HttpResponseMessage getData = await client.GetAsync("timezones?page="+page);
+
+                    if (getData.IsSuccessStatusCode)
+                    {
+                        string result = getData.Content.ReadAsStringAsync().Result;
+                        var res = JsonConvert.DeserializeObject<TimezoneMasterResponseModel>(result);
+                        TimezoneResponsePaginationModel resPagi = new TimezoneResponsePaginationModel();
+                        if (res != null && res.Code == 200)
+                        {
+                            resPagi.CurrentPage = res.Data.CurrentPage;
+                            resPagi.TotalPages = res.Data.TotalPages;
+                            resPagi.PageSize = res.Data.PageSize;
+                            resPagi.NumberOfRecords = res.Data.NumberOfRecords;
+                            resPagi.TotalRecords = res.Data.TotalRecords;
+                            resPagi.Content = res.Data.Content;
+                        }
+                        return View(resPagi);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error calling web api");
+                    }
+                }
+            }
+            return View();
+        }
+
+        public async Task<IActionResult> DetailTimeZone(string? code)
         {
             using (var client = new HttpClient())
             {
@@ -31,30 +99,24 @@ namespace WebApplication1.Controllers
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                HttpResponseMessage getData = await client.GetAsync("timezones");
+                HttpResponseMessage getData = await client.GetAsync("timezones/"+code);
 
-                if(getData.IsSuccessStatusCode)
+                if (getData.IsSuccessStatusCode)
                 {
                     string result = getData.Content.ReadAsStringAsync().Result;
-                    var res = JsonConvert.DeserializeObject<TimezoneResponseModelResponsePagination>(result);
-
-                    List<TimezoneResponseModel> listData = new List<TimezoneResponseModel>();
-                    if (res != null && res.Code == 200)
-                    {
-                        listData.AddRange(res.Data.Content);
-                    }
-
-                    return View(listData);
+                    var res = JsonConvert.DeserializeObject<TimezoneResponseModel>(result);
+                    return View(res);
                 }
                 else
                 {
                     Console.WriteLine("Error calling web api");
-                }    
+                }
             }
             return View();
+
         }
 
-        public IActionResult Privacy()
+            public IActionResult Privacy()
         {
             return View();
         }
