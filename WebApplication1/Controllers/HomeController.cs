@@ -23,71 +23,108 @@ namespace WebApplication1.Controllers
             _logger = logger;
         }
 
-        public async Task<IActionResult> Index(int? page)
+        public async Task<IActionResult> Index(int? page, string? FullTextSearch)
         {
-            if (page == null)
+            if (FullTextSearch == null)
             {
-                using (var client = new HttpClient())
+                if (page == null)
                 {
-                    client.BaseAddress = new Uri(baseURL);
-                    client.DefaultRequestHeaders.Accept.Clear();
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                    using (var client = new HttpClient())
+                    {
+                        client.BaseAddress = new Uri(baseURL);
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                    HttpResponseMessage getData = await client.GetAsync("timezones");
-                    if (getData.IsSuccessStatusCode)
-                    {
-                        string result = getData.Content.ReadAsStringAsync().Result;
-                        var res = JsonConvert.DeserializeObject<TimezoneMasterResponseModel>(result);
-                        TimezoneResponsePaginationModel resPagi = new TimezoneResponsePaginationModel();
-                        if (res != null && res.Code == 200)
+                        HttpResponseMessage getData = await client.GetAsync("timezones");
+                        if (getData.IsSuccessStatusCode)
                         {
-                            resPagi.CurrentPage = res.Data.CurrentPage;
-                            resPagi.TotalPages = res.Data.TotalPages;
-                            resPagi.PageSize = res.Data.PageSize;
-                            resPagi.NumberOfRecords = res.Data.NumberOfRecords;
-                            resPagi.TotalRecords = res.Data.TotalRecords;
-                            resPagi.Content = res.Data.Content;
+                            string result = getData.Content.ReadAsStringAsync().Result;
+                            var res = JsonConvert.DeserializeObject<TimezoneMasterResponseModel>(result);
+                            TimezoneResponsePaginationModel resPagi = new TimezoneResponsePaginationModel();
+                            if (res != null && res.Code == 200)
+                            {
+                                resPagi.CurrentPage = res.Data.CurrentPage;
+                                resPagi.TotalPages = res.Data.TotalPages;
+                                resPagi.PageSize = res.Data.PageSize;
+                                resPagi.NumberOfRecords = res.Data.NumberOfRecords;
+                                resPagi.TotalRecords = res.Data.TotalRecords;
+                                resPagi.Content = res.Data.Content;
+                            }
+                            return View(resPagi);
                         }
-                        return View(resPagi);
+                        else
+                        {
+                            Console.WriteLine("Error calling web api");
+                        }
                     }
-                    else
+                }
+                else
+                {
+                    using (var client = new HttpClient())
                     {
-                        Console.WriteLine("Error calling web api");
+                        client.BaseAddress = new Uri(baseURL);
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                        HttpResponseMessage getData = await client.GetAsync("timezones?page=" + page);
+
+                        if (getData.IsSuccessStatusCode)
+                        {
+                            string result = getData.Content.ReadAsStringAsync().Result;
+                            var res = JsonConvert.DeserializeObject<TimezoneMasterResponseModel>(result);
+                            TimezoneResponsePaginationModel resPagi = new TimezoneResponsePaginationModel();
+                            if (res != null && res.Code == 200)
+                            {
+                                resPagi.CurrentPage = res.Data.CurrentPage;
+                                resPagi.TotalPages = res.Data.TotalPages;
+                                resPagi.PageSize = res.Data.PageSize;
+                                resPagi.NumberOfRecords = res.Data.NumberOfRecords;
+                                resPagi.TotalRecords = res.Data.TotalRecords;
+                                resPagi.Content = res.Data.Content;
+                            }
+                            return View(resPagi);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Error calling web api");
+                        }
                     }
                 }
             }
             else
             {
-                using (var client = new HttpClient())
+                if (page == null)
                 {
-                    client.BaseAddress = new Uri(baseURL);
-                    client.DefaultRequestHeaders.Accept.Clear();
-                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                    HttpResponseMessage getData = await client.GetAsync("timezones?page=" + page);
-
-                    if (getData.IsSuccessStatusCode)
+                    using (var client = new HttpClient())
                     {
-                        string result = getData.Content.ReadAsStringAsync().Result;
-                        var res = JsonConvert.DeserializeObject<TimezoneMasterResponseModel>(result);
-                        TimezoneResponsePaginationModel resPagi = new TimezoneResponsePaginationModel();
-                        if (res != null && res.Code == 200)
+                        client.BaseAddress = new Uri(baseURL);
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                        HttpResponseMessage getData = await client.GetAsync("timezones?page=1&size=20&filter={\"FullTextSearch\":\""+FullTextSearch+"\"}");
+                        if (getData.IsSuccessStatusCode)
                         {
-                            resPagi.CurrentPage = res.Data.CurrentPage;
-                            resPagi.TotalPages = res.Data.TotalPages;
-                            resPagi.PageSize = res.Data.PageSize;
-                            resPagi.NumberOfRecords = res.Data.NumberOfRecords;
-                            resPagi.TotalRecords = res.Data.TotalRecords;
-                            resPagi.Content = res.Data.Content;
+                            string result = getData.Content.ReadAsStringAsync().Result;
+                            var res = JsonConvert.DeserializeObject<TimezoneMasterResponseModel>(result);
+                            TimezoneResponsePaginationModel resPagi = new TimezoneResponsePaginationModel();
+                            if (res != null && res.Code == 200)
+                            {
+                                resPagi.CurrentPage = res.Data.CurrentPage;
+                                resPagi.TotalPages = res.Data.TotalPages;
+                                resPagi.PageSize = res.Data.PageSize;
+                                resPagi.NumberOfRecords = res.Data.NumberOfRecords;
+                                resPagi.TotalRecords = res.Data.TotalRecords;
+                                resPagi.Content = res.Data.Content;
+                            }
+                            return View(resPagi);
                         }
-                        return View(resPagi);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Error calling web api");
+                        else
+                        {
+                            Console.WriteLine("Error calling web api");
+                        }
                     }
                 }
-            }
+            }    
             return View();
         }
 
@@ -104,7 +141,7 @@ namespace WebApplication1.Controllers
                 if (getData.IsSuccessStatusCode)
                 {
                     string result = getData.Content.ReadAsStringAsync().Result;
-                    var resultMasterFormated = JsonConvert.DeserializeObject<TimezoneMasterResponseModel>(result);
+                    var resultMasterFormated = JsonConvert.DeserializeObject<TimezoneMasterResposeModelPage>(result);
                     var res = resultMasterFormated?.Data;
                     return View(res);
                 }

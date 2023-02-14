@@ -1,6 +1,6 @@
 ﻿namespace WebApplication1.Models
 {
-    public class TimezoneMasterResponseModel
+    public class TimezoneMasterResposeModelPage
     {
         public int Code { get; set; }
 
@@ -8,7 +8,6 @@
 
         public int TotalTime { get; set; }
 
-        public TimezoneResponsePaginationModel Data { get; set; }
-
+        public TimezoneResponseModel Data { get; set; }
     }
 }
