@@ -6,6 +6,8 @@
 
         public string Messsage { get; set; }
 
+        public string LicenseInfo { get; set; }
+
         public int TotalTime { get; set; }
 
         public TimezoneResponseModel Data { get; set; }
